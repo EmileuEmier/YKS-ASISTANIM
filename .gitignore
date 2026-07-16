@@ -1,0 +1,6 @@
+# İşletim sistemi dosyaları
+.DS_Store
+Thumbs.db
+
+# VS Code ayarları
+.vscode/
