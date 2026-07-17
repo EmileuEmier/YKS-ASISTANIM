@@ -22,5 +22,12 @@ Bu proje, sınav hazırlık sürecindeki karmaşık veri yapısını anlamlandı
 ## Veri Kaynağı
 Bu projede kullanılan üniversite ve bölüm verileri, [YÖK Atlas](https://yokatlas.yok.gov.tr/) platformundan alınmıştır. Projenin veri doğruluğu ve güncelliği için resmi veriler temel alınmıştır.
 
+## Kullanım
+**Tablo-Uni.py**: (https://www.osym.gov.tr/TR,33377/2025-yuksekogretim-kurumlari-sinavi-yks-yuksekogretim-programlari-ve-kontenjanlari-kilavuzu.html) linkindeki excel tablolarını universiteler.json'da lazım olacak verileri senkronize eden python kodu.
+
+**siralama.py**: Senkronize olan verileri "sira" verisine göre artan sırada "id" numaralarını günceller.
+
+**parantez_temizle**: Güncellenen verilerde gereksiz kalan parantez içi verileri siler.
+
 ## Lisans
 Bu proje "Tüm Hakları Saklıdır" kapsamında korunmaktadır. Detaylar için `LICENSE` dosyasına bakınız.
