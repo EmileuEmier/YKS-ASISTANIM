@@ -1574,3 +1574,350 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
     -moz-appearance: textfield;
 }
+
+/* =========================================
+   MOBİL UYUMLULUK (RESPONSIVE TASARIM)
+   ========================================= */
+
+@media screen and (max-width: 768px) {
+    
+    /* 1. Üst Menü (Navbar) Ayarları */
+    .navbar {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .nav-links {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto; /* Menüyü sağa sola kaydırılabilir yapar */
+        width: 100%;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch; /* iOS'ta yumuşak kaydırma */
+    }
+
+    .nav-btn {
+        flex: 0 0 auto; /* Butonların sıkışıp bozulmasını engeller */
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+
+    /* 2. Grid ve Flexbox Yapılarını Alt Alta Dizme */
+    .net-grid, 
+    .calc-grid,
+    .net-compare-grid,
+    .genel-bilgiler-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* 3. Tercih Robotu Filtre Alanı */
+    .filter-grid-advanced {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Mobilde 2 sütun yapar */
+        gap: 10px;
+    }
+
+    /* 4. Tablo Taşmalarını Önleme */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+    }
+    
+    .tercih-table {
+        min-width: 800px; /* Tablo içeriğinin sıkışmasını önler, yatay scroll açar */
+    }
+
+    /* 5. Modallar (Pop-up Ekranlar) */
+    .modal-content, 
+    .custom-modal {
+        width: 95%;
+        margin: 10px auto;
+        padding: 15px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-top-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .modal-top-right {
+        align-items: center;
+    }
+
+    /* 6. Puan Hesaplama Modülü */
+    .calc-tabs {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .calc-tab {
+        flex: 1 1 auto;
+    }
+
+    .ders-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .ders-inputs-calc {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* 7. Genel Kart ve İçerik Boşlukları */
+    .page {
+        padding: 10px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+}
+
+/* Çok küçük ekranlar için ekstra ayar (Örn: eski model telefonlar) */
+@media screen and (max-width: 480px) {
+    .filter-grid-advanced {
+        grid-template-columns: 1fr; /* Filtreleri tek sütuna düşürür */
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* =========================================
+   MOBİL İÇİN FOTOĞRAFTAKİ TABLO TASARIMI
+   ========================================= */
+@media screen and (max-width: 768px) {
+    
+    /* Yatay kaydırmayı kapat ve tabloyu tam ekrana yay */
+    .table-responsive {
+        overflow-x: hidden !important;
+        border: none !important;
+    }
+
+    .tercih-table {
+        min-width: 100% !important;
+        border-collapse: collapse !important;
+        background-color: #1e293b !important; /* Arka plan rengi */
+    }
+
+    /* 1(Ekle), 2, 5, 6, 7 ve 9(Detay) Sütun Başlıklarını Gizle */
+    .tercih-table th:nth-child(1),
+    .tercih-table th:nth-child(2),
+    .tercih-table th:nth-child(5),
+    .tercih-table th:nth-child(6),
+    .tercih-table th:nth-child(7),
+    .tercih-table th:nth-child(9) {
+        display: none !important;
+    }
+
+    /* Kalan Başlıkları Grid ile Diz (Üniversite | Program | Sıralama) */
+    .tercih-table thead tr {
+        display: grid !important;
+        grid-template-columns: 32% 48% 20% !important;
+        grid-template-areas: "uni prog sira";
+        border-bottom: 1px solid #334155;
+        background-color: #0f172a !important; /* Fotoğraftaki daha koyu lacivert başlık */
+    }
+
+    .tercih-table th:nth-child(3) { grid-area: uni; text-align: left !important; padding: 12px 10px !important; font-size: 0.85rem !important; }
+    .tercih-table th:nth-child(4) { grid-area: prog; text-align: left !important; padding: 12px 10px !important; font-size: 0.85rem !important; }
+    .tercih-table th:nth-child(8) { grid-area: sira; text-align: center !important; padding: 12px 5px !important; font-size: 0.85rem !important; }
+
+    /* Satırların İçeriği: Grid Alanları */
+    .tercih-table tbody tr {
+        display: grid !important;
+        grid-template-columns: 32% 48% 20% !important;
+        grid-template-rows: auto auto !important; /* Üstte metin, altta buton */
+        grid-template-areas: 
+            "uni prog sira"
+            "uni ekle sira" !important;
+        border-bottom: 1px solid #334155 !important;
+    }
+
+    /* Varsayılan padding ve kenarlıkları sıfırla */
+    .tercih-table td {
+        border: none !important;
+        padding: 10px 5px !important;
+        font-size: 0.85rem !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    /* Mobilde Gereksiz Hücreleri Gizle */
+    .tercih-table td:nth-child(2),
+    .tercih-table td:nth-child(5),
+    .tercih-table td:nth-child(6),
+    .tercih-table td:nth-child(7),
+    .tercih-table td:nth-child(9) { /* Detay butonu mobilde tamamen gizlendi */
+        display: none !important;
+    }
+
+    /* 3. Sütun: Üniversite */
+    .tercih-table td:nth-child(3) {
+        grid-area: uni;
+        border-right: 1px solid #334155 !important; /* Fotoğraftaki dikey çizgi */
+        text-align: center !important;
+        font-weight: bold;
+        color: #f8fafc;
+    }
+
+    /* 4. Sütun: Program (Tıklanabilir Bölge) */
+    .tercih-table td:nth-child(4) {
+        grid-area: prog;
+        text-align: center !important;
+        color: #f8fafc;
+        padding-bottom: 5px !important;
+        cursor: pointer;
+    }
+
+    .tercih-table td:nth-child(4):active {
+        opacity: 0.6; /* Tıklanma hissi verir */
+    }
+
+    /* 1. Sütun: Ekle Butonu */
+    .tercih-table td:nth-child(1) {
+        grid-area: ekle;
+        padding-top: 0 !important;
+        padding-bottom: 15px !important;
+    }
+
+    /* Ekle Butonu Görünümü (Fotoğraftaki + Listeme Ekle tarzı) */
+    .tercih-table td:nth-child(1) button {
+        background-color: #38bdf8 !important; /* Açık mavi */
+        color: #0f172a !important; /* Koyu lacivert yazı */
+        border-radius: 20px !important; /* Tam hap şeklinde */
+        padding: 6px 15px !important;
+        font-weight: bold !important;
+        font-size: 0.85rem !important;
+        width: auto !important;
+        border: none !important;
+    }
+
+    /* 8. Sütun: Sıralama */
+    .tercih-table td:nth-child(8) {
+        grid-area: sira;
+        border-left: 1px solid #334155 !important; /* Fotoğraftaki dikey çizgi */
+        font-weight: bold;
+        color: #f8fafc;
+        font-size: 1rem !important;
+    }
+
+    /* YENİ: Mobilde satıra dokunulduğunda/hover yapıldığında grileşme efekti */
+    .mobil-tiklanabilir-satir {
+        cursor: pointer;
+        transition: background-color 0.2s ease !important;
+    }
+
+    .mobil-tiklanabilir-satir:hover,
+    .mobil-tiklanabilir-satir:active {
+        background-color: #334155 !important; /* Tasarımına uygun hoş bir slate/gri tonu */
+    }
+
+    /* YENİ: Mobilde detay sütununu ve başlığını tamamen gizle */
+    td.detay-sutunu,
+    th:last-child {
+        display: none !important;
+    }
+
+    /* style.css dosyasındaki @media (max-width: 768px) bloğunun içine ekle */
+
+    /* 1. Sayfalama alanını kapsayan ana kapsayıcı */
+    .yok-atlas-pagination { 
+        display: flex !important;
+        flex-direction: row !important; /* Butonların yan yana dizilmeye devam etmesi için row kalmalı */
+        flex-wrap: wrap !important; /* Elemanların genişliğe göre alt satıra inmesini sağlar */
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 15px !important; /* Satırlar ve butonlar arası boşluk */
+        padding: 15px 0 !important;
+    }
+
+    /* 2. "... kayıttan ...-..." bilgisinin olduğu kısım -> EN ÜSTE (Sıra: 1) */
+    .yok-atlas-pagination > span:first-of-type { 
+        order: 1 !important;
+        text-align: center !important;
+        width: 100% !important; /* Satırı tamamen kaplamasını ve diğerlerini alta itmesini sağlar */
+        margin: 0 !important; /* JS'den gelen margin-right'ı sıfırlar */
+    }
+
+    /* 3. Önceki, sonraki ve numara butonlarının olduğu kısım -> ORTAYA (Sıra: 2) */
+    /* JS tarafında butonları saran ayrı bir kapsayıcı div olmadığı için doğrudan butonlara sıra veriyoruz */
+    .yok-atlas-pagination button,
+    .yok-atlas-pagination .dots { 
+        order: 2 !important;
+    }
+
+    /* 4. Manuel sayfa girme inputu alanı -> EN ALTA (Sıra: 3) */
+    .manual-page-zone { 
+        order: 3 !important;
+        display: flex !important;
+        justify-content: center !important; /* İçeriği ortala */
+        width: 100% !important; /* Satırı tamamen kapla */
+        margin: 10px 0 0 0 !important; /* JS'den gelen soldaki margin'i sıfırlayıp üste boşluk verdik */
+        padding: 0 !important; /* JS'den gelen soldaki padding'i sıfırladık */
+        border-left: none !important; /* Masaüstündeki dikey çizgiyi mobilde gizledik */
+    }
+}
+
+/* ========================================= */
+/* --- SADECE MOBİL İÇİN GÜNCELLEMELER ---   */
+/* ========================================= */
+@media (max-width: 768px) {
+    /* 1. Detay butonunu ve bulunduğu sütunu tamamen kaldır */
+    td.detay-sutunu,
+    th:last-child {
+        display: none !important;
+    }
+
+    /* 2. Tüm kaydırma çubuklarını (sliderları) görünmez yap (kaydırma çalışmaya devam eder) */
+    *::-webkit-scrollbar {
+        display: none !important;
+    }
+    * {
+        -ms-overflow-style: none !important;  /* IE and Edge için */
+        scrollbar-width: none !important;     /* Firefox için */
+    }
+
+    /* 3. Artı butonunu genişlet ve yazıyı göster */
+    .btn-tercih-tablo {
+        width: 140px !important; /* Butonu genişlettik */
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px !important;
+        border-radius: 8px !important;
+        font-size: 14px !important;
+    }
+    
+    .btn-tercih-tablo .btn-yazi {
+        display: inline-block !important; /* Mobilde yazıyı göster */
+        font-weight: bold;
+        white-space: nowrap; /* Yazının alt satıra kaymasını engeller */
+    }
+}
+
+/* ========================================= */
+/* --- BİLGİSAYAR GÖRÜNÜMÜ KORUMASI ---      */
+/* ========================================= */
+@media (min-width: 769px) {
+    /* Bilgisayarda geniş buton istemiyoruz, sadece ikon kalmalı */
+    .btn-tercih-tablo .btn-yazi {
+        display: none !important; 
+    }
+}

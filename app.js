@@ -777,7 +777,7 @@ function getCheckedValues(containerId) {
     return Array.from(document.querySelectorAll(`#${containerId} input:checked`)).map(cb => cb.value);
 }
 
-// Tabloyu Çizme
+// Tabloyu Çizme Fonksiyonunu bu şekilde güncelle
 function renderTable(data) {
     const tbody = document.getElementById('tercih-tbody');
     tbody.innerHTML = '';
@@ -788,8 +788,20 @@ function renderTable(data) {
     data.forEach(item => {
         const isAdded = tercihListem.includes(item.id);
         const tr = document.createElement('tr');
+        
+        // YENİ EKLENEN KOD: Satıra class atayıp sadece mobilde tıklanabilir yaptık
+        tr.className = "mobil-tiklanabilir-satir";
+        tr.onclick = function(e) {
+            // Eğer ekran boyutu mobil (768px ve altı) ise modalı aç
+            if (window.innerWidth <= 768) {
+                openModal(item.id);
+            }
+        };
+
+        // DİKKAT: onClick içindeki 'event.stopPropagation();' eklentileri çok önemlidir.
         tr.innerHTML = `
-            <td><button class="btn-icon ${isAdded ? 'added' : ''}" onclick="toggleTercih(${item.id}, this)">
+            <td><button class="btn-icon btn-tercih-tablo ${isAdded ? 'added' : ''}" onclick="event.stopPropagation(); toggleTercih(${item.id}, this)">
+                <span class="btn-yazi">${isAdded ? 'Listemde' : 'Listeme Ekle'}</span>
                 <i class="fa-solid ${isAdded ? 'fa-check' : 'fa-plus'}"></i>
             </button></td>
             <td>${item.programKodu}</td>
@@ -799,7 +811,7 @@ function renderTable(data) {
             <td>${item.uniTuru}</td>
             <td>${item.puanTuru}</td>
             <td style="font-weight: bold; color: white;">${item.sira.toLocaleString('tr-TR')}</td>
-            <td><button class="btn-detail" onclick="openModal(${item.id})">Detay <i class="fa-solid fa-chevron-right"></i></button></td>
+            <td class="detay-sutunu"><button class="btn-detail" onclick="event.stopPropagation(); openModal(${item.id})">Detay <i class="fa-solid fa-chevron-right"></i></button></td>
         `;
         tbody.appendChild(tr);
     });
@@ -878,11 +890,11 @@ window.toggleTercih = function(id, btn) {
     if (index === -1) {
         tercihListem.push(id);
         btn.classList.add('added');
-        btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+        btn.innerHTML = '<span class="btn-yazi">Listemde</span> <i class="fa-solid fa-check"></i>';
     } else {
         tercihListem.splice(index, 1);
         btn.classList.remove('added');
-        btn.innerHTML = '<i class="fa-solid fa-plus"></i>';
+        btn.innerHTML = '<span class="btn-yazi">Listeme Ekle</span> <i class="fa-solid fa-plus"></i>';
         if(gosterSadeceListem) filterData();
     }
     localStorage.setItem('yksTercihListem', JSON.stringify(tercihListem));
