@@ -665,6 +665,9 @@ hesaplamaEventleriniBagla(); // Sabit kalan TYT inputları için dinleyicileri b
 // --- 4. TERCİH ROBOTU VE GELİŞMİŞ FİLTRELEME ---
 // Global veri havuzumuz (JSON'dan yüklenecek)
 let mockDatabase = [];
+let currentFilteredData = []; // Filtrelenmiş veriyi hafızada tutar
+let currentPage = 1;
+const itemsPerPage = 50; // Her sayfada 50 veri
 
 let tercihListem = JSON.parse(localStorage.getItem('yksTercihListem')) || [];
 let gosterSadeceListem = false; 
@@ -684,8 +687,9 @@ async function initApp() {
         populateDropdown('prog', 'filter-prog-list');
         populateDropdown('sehir', 'filter-sehir-list');
         
-        // İlk tablo çizimi
-        renderTable(mockDatabase);
+        // Başlangıçta tüm veriyi filtrelenmiş kabul et ve ilk sayfayı göster
+        currentFilteredData = mockDatabase;
+        gosterSayfa();
         
     } catch (error) {
         console.error("JSON yükleme hatası:", error);
@@ -731,13 +735,40 @@ window.addEventListener('click', () => {
     document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
 });
 
-// Dropdownları gelen veriyle doldurma fonksiyonu
 function populateDropdown(dataKey, containerId) {
-    const uniqueValues = [...new Set(mockDatabase.map(item => item[dataKey]))];
+    // Verileri benzersiz hale getir ve harf sırasına diz
+    const uniqueValues = [...new Set(mockDatabase.map(item => item[dataKey]))].filter(Boolean).sort();
     const container = document.getElementById(containerId);
-    container.innerHTML = ''; // İçini temizle
+    
+    // Arama kutusu ve checkbox listesi için HTML yapısı
+    let html = `
+        <div style="padding: 5px; position: sticky; top: 0; background: var(--card-bg, #1e293b); z-index: 10;">
+            <input type="text" class="dd-search-input dy-input" placeholder="Ara..." style="width: 100%; padding: 8px; font-size: 14px; margin-bottom: 5px;">
+        </div>
+        <div class="dd-checkbox-list">
+    `;
+    
     uniqueValues.forEach(val => {
-        container.innerHTML += `<label><input type="checkbox" value="${val}"> ${val}</label>`;
+        html += `<label class="dd-label-item"><input type="checkbox" value="${val}"> <span class="dd-text">${val}</span></label>`;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+
+    // Arama Motoru Dinleyicisi
+    const searchInput = container.querySelector('.dd-search-input');
+    const labels = container.querySelectorAll('.dd-label-item');
+    
+    searchInput.addEventListener('input', function(e) {
+        // Türkçe karakter destekli küçük harfe çevirme
+        const term = e.target.value.toLocaleLowerCase('tr-TR');
+        labels.forEach(label => {
+            const text = label.querySelector('.dd-text').textContent.toLocaleLowerCase('tr-TR');
+            if (text.includes(term)) {
+                label.style.display = 'block';
+            } else {
+                label.style.display = 'none';
+            }
+        });
     });
 }
 
@@ -806,7 +837,24 @@ function filterData() {
 
         return true;
     });
-    renderTable(filtered);
+
+    // YENİ: Filtrelenen veriyi global değişkene at ve 1. sayfaya dön
+    currentFilteredData = filtered;
+    currentPage = 1; 
+    gosterSayfa();
+}
+
+// YENİ: Sadece istenilen sayfanın verisini kesip tabloya yollar
+function gosterSayfa() {
+    // Verileri ID'ye göre değil, başarı sırasına göre küçükten büyüğe diz
+    currentFilteredData.sort((a, b) => a.sira - b.sira);
+
+    const baslangic = (currentPage - 1) * itemsPerPage;
+    const bitis = baslangic + itemsPerPage;
+    const sayfaVerisi = currentFilteredData.slice(baslangic, bitis); // Veriyi burada bölüyoruz!
+    
+    renderTable(sayfaVerisi);
+    renderPagination();
 }
 
 // Tercih Listem Butonu Tetikleyicisi
@@ -866,6 +914,8 @@ window.openModal = function(id) {
     document.getElementById('m-puan-turu').textContent = d.puanTuru;
     document.getElementById('m-dil').textContent = d.dil;
     document.getElementById('m-burs').textContent = d.ucret;
+    document.getElementById('m-siraSarti').textContent = d.siraSarti;
+    document.getElementById('m-akreditasyon').textContent = d.akreditasyon;
 
     document.getElementById('m-son-tyt-tr').textContent = d.netler.tyt?.tr || "-";
     document.getElementById('m-son-tyt-sos').textContent = d.netler.tyt?.sos || "-";
@@ -1659,3 +1709,90 @@ programiCiz();
 
     setInterval(yasHesapla, 25);
 })();
+
+function renderPagination() {
+    const container = document.getElementById('pagination-container');
+    if(!container) return;
+    container.innerHTML = '';
+    
+    // Toplam sayfa sayısını hesapla
+    const totalPages = Math.ceil(currentFilteredData.length / itemsPerPage);
+    if(totalPages <= 1 && currentFilteredData.length === 0) return; 
+
+    let html = `<div class="yok-atlas-pagination" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;">`;
+    
+    // Kayıt Göstergesi Metni
+    const baslangicKayit = ((currentPage - 1) * itemsPerPage) + 1;
+    const bitisKayit = Math.min(currentPage * itemsPerPage, currentFilteredData.length);
+    const toplamKayit = currentFilteredData.length;
+    
+    html += `<span style="color: #9ca3af; font-size: 14px; margin-right: 10px; font-weight: 500;">
+                ${toplamKayit} kayıttan ${baslangicKayit}-${bitisKayit}
+             </span>`;
+
+    // Önceki butonu
+    if (currentPage > 1) {
+        html += `<button onclick="sayfaDegistir(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i> Önceki</button>`;
+    }
+
+    // Akıllı sayfa numaralandırma
+    let bas = Math.max(1, currentPage - 2);
+    let son = Math.min(totalPages, currentPage + 2);
+
+    if (bas > 1) html += `<button onclick="sayfaDegistir(1)">1</button><span class="dots">...</span>`;
+
+    for (let i = bas; i <= son; i++) {
+        if (i === currentPage) {
+            html += `<button class="active-page">${i}</button>`;
+        } else {
+            html += `<button onclick="sayfaDegistir(${i})">${i}</button>`;
+        }
+    }
+
+    if (son < totalPages) html += `<span class="dots">...</span><button onclick="sayfaDegistir(${totalPages})">${totalPages}</button>`;
+
+    // Sonraki butonu
+    if (currentPage < totalPages) {
+        html += `<button onclick="sayfaDegistir(${currentPage + 1})">Sonraki <i class="fa-solid fa-chevron-right"></i></button>`;
+    }
+
+    // Manuel Sayfa Giriş Bölümü (onkeydown ile Enter desteği ve gizleme sınıfı eklendi)
+    if (totalPages > 1) {
+        html += `
+            <div class="manual-page-zone" style="display: flex; align-items: center; gap: 6px; margin-left: 10px; padding-left: 10px; border-left: 1px solid #334155;">
+                <input type="number" id="manual-page-num" min="1" max="${totalPages}" value="${currentPage}" 
+                       onkeydown="if(event.key === 'Enter') manuelSayfaGit()"
+                       style="width: 55px; padding: 7px; text-align: center; border-radius: 6px; border: 1px solid #3b82f6; background: var(--card-bg, #1e293b); color: white; font-weight: bold;">
+                <span style="color: #9ca3af; font-size: 14px;">/ ${totalPages}</span>
+                <button onclick="manuelSayfaGit()" style="padding: 7px 12px; background-color: #3b82f6; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;">Git</button>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+// Parametresiz çalışan yeni güvenli yönlendirme motoru
+window.manuelSayfaGit = function() {
+    const input = document.getElementById('manual-page-num');
+    if (!input) return;
+    
+    let hedefSayfa = parseInt(input.value);
+    const totalPages = Math.ceil(currentFilteredData.length / itemsPerPage);
+    
+    // Sınır kontrolleri
+    if (isNaN(hedefSayfa) || hedefSayfa < 1) {
+        hedefSayfa = 1;
+    } else if (hedefSayfa > totalPages) {
+        hedefSayfa = totalPages;
+    }
+    
+    sayfaDegistir(hedefSayfa);
+}
+
+// Butonlara tıklayınca çalışacak global sayfa değiştirme fonksiyonu
+window.sayfaDegistir = function(page) {
+    currentPage = page;
+    gosterSayfa();
+}

@@ -369,19 +369,6 @@ input:focus, select:focus {
     margin-left: 10px;
 }
 
-/* --- INPUT KUTULARINDAKİ OK TUŞLARINI VE BEYAZLIKLARI SİLME --- */
-/* Chrome, Safari, Edge ve Opera için */
-.calc-input::-webkit-outer-spin-button,
-.calc-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* Firefox için */
-.calc-input[type=number] {
-    -moz-appearance: textfield;
-}
-
 /* Kutuyu genişletip içindeki yazıyı ortalıyoruz */
 .calc-input {
     width: 65px !important; /* Kutuları genişlettik, 2 basamak rahat sığar */
@@ -1540,4 +1527,50 @@ input:focus, select:focus {
     background: #10b981;
     color: #111827; /* Zıtlık için koyu renk */
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.yok-atlas-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 15px 0;
+}
+.yok-atlas-pagination button {
+    background-color: var(--card-bg, #1e293b);
+    color: white;
+    border: 1px solid #3b82f6;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.yok-atlas-pagination button:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+}
+.yok-atlas-pagination button.active-page {
+    background-color: #10b981;
+    border-color: #10b981;
+    color: #000;
+    font-weight: bold;
+}
+.yok-atlas-pagination .dots {
+    color: #9ca3af;
+    padding: 0 5px;
+    font-weight: bold;
+}
+
+/* Chrome, Safari, Edge ve Opera için sayı girdilerindeki okları kaldırır */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox için sayı girdilerindeki okları kaldırır */
+input[type="number"] {
+    -moz-appearance: textfield;
 }

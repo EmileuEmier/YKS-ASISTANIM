@@ -376,6 +376,7 @@
                     <div class="custom-dropdown" id="dd-puan">
                         <div class="dropdown-btn">Puan Türü <i class="fa-solid fa-chevron-down"></i></div>
                         <div class="dropdown-content">
+                            <label><input type="checkbox" value="TYT"> TYT</label>
                             <label><input type="checkbox" value="SAY"> SAY</label>
                             <label><input type="checkbox" value="EA"> EA</label>
                             <label><input type="checkbox" value="SÖZ"> SÖZ</label>
@@ -407,9 +408,9 @@
                     <div class="custom-dropdown" id="dd-derece">
                         <div class="dropdown-btn">Ön Lisans / Lisans <i class="fa-solid fa-chevron-down"></i></div>
                         <div class="dropdown-content">
-                            <label><input type="checkbox" value="Lisans"> Lisans</label>
-                            <label><input type="checkbox" value="Ön Lisans"> Ön Lisans</label>
-                            <label><input type="checkbox" value="Özel Yetenek"> Özel Yetenek</label>
+                            <label><input type="checkbox" value="LİSANS"> LİSANS</label>
+                            <label><input type="checkbox" value="ÖN LİSANS"> ÖN LİSANS</label>
+                            <label><input type="checkbox" value="ÖZEL YETENEK"> ÖZEL YETENEK</label>
                         </div>
                     </div>
 
@@ -420,6 +421,7 @@
                             <label><input type="checkbox" value="VAKIF"> VAKIF</label>
                             <label><input type="checkbox" value="KKTC"> KKTC</label>
                             <label><input type="checkbox" value="YURTDIŞI VAKIF"> YURTDIŞI VAKIF</label>
+                            <label><input type="checkbox" value="VAKIF MYO"> VAKIF MYO</label>
                         </div>
                     </div>
 
@@ -428,24 +430,26 @@
                         <div class="dropdown-content">
                             <label><input type="checkbox" value="ÜCRETSİZ"> ÜCRETSİZ</label>
                             <label><input type="checkbox" value="ÜCRETLİ"> ÜCRETLİ</label>
-                            <label><input type="checkbox" value="Burslu"> BURSLU</label>
-                            <label><input type="checkbox" value="%50 İndirimli"> %50 İNDİRİMLİ</label>
+                            <label><input type="checkbox" value="BURSLU"> BURSLU</label>
+                            <label><input type="checkbox" value="%25 İNDİRİMLİ"> %25 İNDİRİMLİ</label>
+                            <label><input type="checkbox" value="%50 İNDİRİMLİ"> %50 İNDİRİMLİ</label>
                         </div>
                     </div>
 
                     <div class="custom-dropdown" id="dd-ogretimturu">
                         <div class="dropdown-btn">Öğretim Türü <i class="fa-solid fa-chevron-down"></i></div>
                         <div class="dropdown-content">
-                            <label><input type="checkbox" value="Örgün Öğretim"> ÖRGÜN ÖĞRETİM</label>
-                            <label><input type="checkbox" value="Uzaktan Öğretim"> UZAKTAN ÖĞRETİM</label>
-                            <label><input type="checkbox" value="Açık Öğretim"> AÇIK ÖĞRETİM</label>
+                            <label><input type="checkbox" value="Örgün Öğretim"> Örgün Öğretim</label>
+                            <label><input type="checkbox" value="UOLP"> UOLP</label>
+                            <label><input type="checkbox" value="Uzaktan ÖĞRETİM"> Uzaktan Öğretim</label>
+                            <label><input type="checkbox" value="Açık Öğretim"> Açık Öğretim</label>
                         </div>
                     </div>
 
                     <!-- Normal Inputlar -->
                     <input type="text" id="search-kod" class="filter-input" placeholder="Program Kodu">
-                    <input type="number" id="search-enaz" class="filter-input" placeholder="En Az Başarı Sırası (Bin)">
-                    <input type="number" id="search-encok" class="filter-input" placeholder="En Çok Başarı Sırası (Bin)">
+                    <input type="number" id="search-enaz" class="filter-input" placeholder="En Az Başarı Sırası">
+                    <input type="number" id="search-encok" class="filter-input" placeholder="En Çok Başarı Sırası">
                     
                     <button id="btn-filtrele" class="btn-primary" style="height: 45px;"><i class="fa-solid fa-search"></i> Ara</button>
                 </div>
@@ -472,6 +476,9 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Tercih robotundaki </table> etiketinin hemen altına ekle -->
+            <div id="pagination-container" style="margin-top: 20px; width: 100%;"></div>
 
             <footer style="text-align: center; font-size: 0.8rem; color: #64748b; margin-top: 50px; padding: 20px;">
                 <p>Veri Kaynağına ve Daha Fazla Veriye Ulaşmak için: <a href="https://yokatlas.yok.gov.tr/" target="_blank" style="color: #3b82f6;">YÖK Atlas</a></p>
@@ -520,6 +527,8 @@
                             <div class="b-card"><span>Öğretim Dili</span><strong id="m-dil">-</strong></div>
                             
                             <div class="b-card"><span>Burs</span><strong id="m-burs">-</strong></div>
+                            <div class="b-card"><span>Öğrenim Yılı</span><strong id="m-siraSarti">0</strong></div>
+                            <div class="b-card"><span>Akreditasyon</span><strong id="m-akreditasyon">0</strong></div>
                             <div class="b-card" style="visibility: hidden;"></div>
                         </div>
                     </div>
