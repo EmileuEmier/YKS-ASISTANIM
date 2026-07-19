@@ -16,13 +16,27 @@
         <div class="logo">
             <i class="fa-solid fa-graduation-cap"></i> YKS<span>ASİSTANIM</span>
         </div>
-        <div class="nav-links">
+        <div class="nav-links" style="display: flex; align-items: center; gap: 10px;">
             <button class="nav-btn active" data-target="ana-menu"><i class="fa-solid fa-house"></i> Ana Ekran</button>
             <button class="nav-btn" data-target="net-takip"><i class="fa-solid fa-chart-line"></i> Net Takibi</button>
             <button class="nav-btn" data-target="hesaplama"><i class="fa-solid fa-calculator"></i> Puan Hesapla</button>
             <button class="nav-btn" data-target="tercih"><i class="fa-solid fa-magnifying-glass"></i> Tercih Robotu</button>
             <button class="nav-btn" data-target="program"><i class="fa-solid fa-calendar-days"></i> AI Program</button>
             <button class="nav-btn" data-target="hakkimda"><i class="fa-solid fa-user-astronaut"></i> Hakkımda</button>
+
+            <!-- YUVARLAK PROFİL BUTONU VE DROPDOWN KISMI -->
+            <div class="profil-kapsayici">
+                <button id="profil-btn" class="yuvarlak-profil-btn" title="Hesabım">
+                    <span id="profil-bas-harf">K</span>
+                </button>
+                
+                <div id="profil-dropdown" class="dropdown-gizli custom-profil-dropdown">
+                    <div id="hesap-bilgisi" class="kullanici-adi-text">Kullanıcı</div>
+                    <button id="cikis-btn" class="cikis-yap-btn">
+                        <i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap
+                    </button>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -664,10 +678,40 @@
             </div>
         </section>
 
+        <!-- Sayfanın En Altına Eklenecek Auth (Giriş/Kayıt) Modalı -->
+        <div id="auth-modal" class="modal">
+            <div class="modal-content auth-kutu">
+                <h2 id="auth-baslik">Giriş Yap</h2>
+                <!-- E-posta alanı eklendi -->
+                <input type="email" id="auth-email" placeholder="E-posta Adresi">
+        
+                <!-- Kullanıcı Adı alanı (Kayıt olurken görünecek) -->
+                <input type="text" id="auth-kullanici-adi" placeholder="Kullanıcı Adı">
+        
+                <input type="password" id="auth-sifre" placeholder="Şifre">
+                <button id="auth-onay-btn" class="auth-btn">Giriş Yap</button>
+                <p id="auth-hata" class="hata-mesaji"></p>
+                <div id="auth-sifremi-unuttum" style="color: #3b82f6; font-size: 12px; cursor: pointer; text-align: left; margin-top: 5px; margin-bottom: 10px;">
+                    Şifreni mi unuttun?
+                </div>
+                <p class="auth-alt-metin">
+                    <span id="auth-soru">Hesabın yok mu?</span> 
+                    <span id="auth-mod-degistir" class="vurgulu-link">Kayıt Ol</span>
+                </p>
+            </div>
+        </div>
+
     </main>
 
     <!-- Chart.js Kütüphanesi -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="app.js"></script>
+    <!-- Firebase Ana Kütüphanesi -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <!-- Firebase Giriş (Auth) Kütüphanesi -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Yeni/Doğru Hali -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>

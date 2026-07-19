@@ -1921,3 +1921,272 @@ input[type="number"] {
         display: none !important; 
     }
 }
+
+/* Profil Butonu ve Menü Konteyneri */
+.kullanici-menusu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Auth Modal Özel Tasarımı */
+.auth-kutu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 350px;
+    margin: 15% auto;
+}
+
+.auth-kutu input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #334155;
+    color: white;
+}
+
+.auth-btn {
+    background-color: #4ade80;
+    color: black;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.vurgulu-link {
+    color: #4ade80;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.hata-mesaji {
+    color: #ef4444;
+    font-size: 14px;
+    display: none;
+    margin: 0;
+}
+
+/* --- PROFİL BUTONU VE DROPDOWN STİLLERİ --- */
+
+.profil-kapsayici {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-left: 10px; /* Diğer butonlarla arasına hafif boşluk */
+}
+
+.yuvarlak-profil-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: var(--neon-green, #ccff00);
+    color: #000;
+    border: 2px solid transparent;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.yuvarlak-profil-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(204, 255, 0, 0.5);
+}
+
+.custom-profil-dropdown {
+    position: absolute;
+    top: 55px; /* Butonun hemen altında açılması için */
+    right: 0;
+    background-color: var(--card-bg, #1e293b);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px;
+    min-width: 160px;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* JavaScript'in açıp kapatabilmesi için classlar */
+.dropdown-gizli {
+    display: none !important;
+}
+
+.dropdown-acik {
+    display: flex !important;
+}
+
+.kullanici-adi-text {
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #334155;
+    font-size: 1rem;
+}
+
+.cikis-yap-btn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.cikis-yap-btn:hover {
+    background-color: #dc2626;
+}
+
+/* ==========================================================================
+   GİRİŞ YAP & KAYIT OL (AUTH MODAL) TASARIMI
+   ========================================================================== */
+
+/* Arka Plan Karartma (Overlay) */
+#auth-modal {
+    display: none; /* NOT: JS tarafında açarken .style.display = 'flex' yapmalısın! */
+    position: fixed; /* Sayfa kaydırılsa bile ekrana sabitler */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Ekran genişliği kadar */
+    height: 100vh; /* Ekran yüksekliği kadar (Sayfa ne kadar uzun olursa olsun) */
+    background-color: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+
+    /* İÇERİDEKİ KUTUYU TAM ORTALAYAN SİHİRLİ DOKUNUŞ */
+    display: none; /* JS açtığında 'flex' olacak */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Güncellenmiş Modal Pencere Kutusu */
+.auth-kutu {
+    /* Eski position: absolute, top, left, transform kodlarını tamamen sildik! */
+    width: 100%;
+    max-width: 460px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+/* Başlık Grafiği */
+#auth-baslik {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+/* Form Giriş Alanları (Inputs) */
+.auth-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+#auth-email,
+#auth-kullanici-adi,
+#auth-sifre {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* Input Odaklanma Efekti (Focus) */
+#auth-email:focus,
+#auth-kullanici-adi:focus,
+#auth-sifre:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    background-color: #1e293b;
+}
+
+/* Hata Mesajı Kutusu */
+#auth-hata {
+    display: none; /* JS hata durumuna göre block yapacak */
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Onay Butonu (Giriş Yap / Kayıt Ol) */
+#auth-onay-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #3b82f6; /* Canlı Mavi */
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 5px;
+}
+
+#auth-onay-btn:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+#auth-onay-btn:active {
+    transform: translateY(0);
+}
+
+/* Alt Alt Değiştirme Alanı (Mod Değiştirici) */
+.auth-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+#auth-soru {
+    margin-right: 5px;
+}
+
+#auth-mod-degistir {
+    color: #ccff00; /* Projedeki neon sarı/yeşil renk accent'i */
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+#auth-mod-degistir:hover {
+    color: #a3cc00;
+    text-decoration: underline;
+}

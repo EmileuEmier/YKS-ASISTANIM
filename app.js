@@ -1,3 +1,70 @@
+// Eski hali (Hatalı):
+// import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
+
+// Yeni hali (Doğru):
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+// Firestore import satırını bu şekilde güncelle:
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+// Auth için import satırını şu şekilde güncelle:
+// Auth için import satırını şu şekilde güncelle:
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBUatB-qKrdPzzNoI6h1vOostNwjpzANb4",
+  authDomain: "yks-asistanim-4ddbc.firebaseapp.com",
+  databaseURL: "https://yks-asistanim-4ddbc-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "yks-asistanim-4ddbc",
+  storageBucket: "yks-asistanim-4ddbc.firebasestorage.app",
+  messagingSenderId: "530208653555",
+  appId: "1:530208653555:web:b6d74bd3a91fd43057f786",
+  measurementId: "G-02W8BDM41T"
+};
+
+// Uygulamayı ve servisleri başlat
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Kullanıcı ID'sini globalde tanımla
+let aktifKullaniciId = null;    
+
+// Kullanıcı giriş durumunu dinle
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        aktifKullaniciId = user.uid; // Kullanıcının benzersiz ID'si
+        await kullaniciVerileriniGetir(aktifKullaniciId);
+    } else {
+        // Yönlendirme iptal edildi.
+        // Kullanıcı giriş yapmamışsa sayfanın en altındaki DOMContentLoaded
+        // içindeki listener zaten auth-modal'ı (popup'ı) açacaktır.
+        aktifKullaniciId = null; 
+    }
+});
+
+// Firebase'den Veri Çekme Fonksiyonu
+async function kullaniciVerileriniGetir(uid) {
+    const userRef = doc(db, "kullanicilar", uid);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        tumDenemeler = data.denemeler || [];
+        tercihListem = data.tercihler || [];
+        hedefler = data.hedefler || [];
+    } else {
+        // Kullanıcı sisteme ilk kez kayıt olmuşsa ve belgesi yoksa boş belge oluştur
+        await setDoc(userRef, { denemeler: [], tercihler: [], hedefler: [] });
+    }
+
+    // VERİLER GELDİKTEN SONRA ARAYÜZÜ GÜNCELLE
+    // (Daha önce bu fonksiyonlar en altta sayfa yüklenirken çalışıyordu, 
+    // artık veriler Firebase'den geldikten sonra çalışmalılar)
+    verileriGuncelle();
+    document.getElementById('tercih-count').textContent = tercihListem.length;
+    if(gosterSadeceListem) filterData(); // Tercih robotu tablosunu listeye göre güncelle
+    hedefleriCiz();
+}
+
 // --- 1. SAYFA GEÇİŞ (SPA) MANTIĞI ---
 const navButtons = document.querySelectorAll('.nav-btn');
 const pages = document.querySelectorAll('.page');
@@ -21,7 +88,7 @@ navButtons.forEach(btn => {
 
 // --- 2. GELİŞMİŞ NET TAKİBİ VE GRAFİK SİSTEMİ ---
 
-let tumDenemeler = JSON.parse(localStorage.getItem('yksDenemeVerileri')) || [];
+let tumDenemeler = [];
 
 // Müfredata 'soru' (Soru Sayısı) özelliği eklendi (Doğru/Yanlış sınırı için)
 const sinavMufredati = {
@@ -198,7 +265,7 @@ document.getElementById('btn-net-kaydet').addEventListener('click', () => {
     }
 
     tumDenemeler.push(denemeVerisi);
-    localStorage.setItem('yksDenemeVerileri', JSON.stringify(tumDenemeler));
+    firebaseVerileriKaydet();
 
     // Formu Temizle
     document.getElementById('nt-deneme-adi').value = '';
@@ -437,7 +504,7 @@ document.getElementById('btn-duzenleme-kaydet').addEventListener('click', () => 
         genel: document.getElementById('edit-sira-genel').value || ""
     };
 
-    localStorage.setItem('yksDenemeVerileri', JSON.stringify(tumDenemeler));
+    firebaseVerileriKaydet();
     verileriGuncelle();
     modalKapat('edit-modal');
 });
@@ -446,7 +513,7 @@ document.getElementById('btn-duzenleme-kaydet').addEventListener('click', () => 
 window.denemeSil = function(id) {
     if(confirm("Bu denemeyi silmek istediğinize emin misiniz?")) {
         tumDenemeler = tumDenemeler.filter(d => d.id !== id);
-        localStorage.setItem('yksDenemeVerileri', JSON.stringify(tumDenemeler));
+        firebaseVerileriKaydet();
         verileriGuncelle();
     }
 }
@@ -669,7 +736,7 @@ let currentFilteredData = []; // Filtrelenmiş veriyi hafızada tutar
 let currentPage = 1;
 const itemsPerPage = 50; // Her sayfada 50 veri
 
-let tercihListem = JSON.parse(localStorage.getItem('yksTercihListem')) || [];
+let tercihListem = [];
 let gosterSadeceListem = false; 
 document.getElementById('tercih-count').textContent = tercihListem.length;
 
@@ -897,7 +964,7 @@ window.toggleTercih = function(id, btn) {
         btn.innerHTML = '<span class="btn-yazi">Listeme Ekle</span> <i class="fa-solid fa-plus"></i>';
         if(gosterSadeceListem) filterData();
     }
-    localStorage.setItem('yksTercihListem', JSON.stringify(tercihListem));
+    firebaseVerileriKaydet(); // YENİ
     document.getElementById('tercih-count').textContent = tercihListem.length;
 }
 
@@ -1107,7 +1174,7 @@ function istatistikleriGuncelle() {
 }
 
 // C) Günlük Hedefler (To-Do List) Sistemi
-let hedefler = JSON.parse(localStorage.getItem('yksHedefler')) || [];
+let hedefler = [];
 const todoInput = document.getElementById('todo-input');
 const todoList = document.getElementById('todo-list');
 
@@ -1132,7 +1199,7 @@ document.getElementById('btn-add-todo').addEventListener('click', () => {
     const metin = todoInput.value.trim();
     if (metin !== "") {
         hedefler.push({ metin: metin, tamamlandi: false });
-        localStorage.setItem('yksHedefler', JSON.stringify(hedefler));
+        firebaseVerileriKaydet();
         todoInput.value = '';
         hedefleriCiz();
     }
@@ -1145,13 +1212,13 @@ todoInput.addEventListener('keypress', function(e) {
 
 window.hedefTamamla = function(index) {
     hedefler[index].tamamlandi = !hedefler[index].tamamlandi;
-    localStorage.setItem('yksHedefler', JSON.stringify(hedefler));
+    firebaseVerileriKaydet();
     hedefleriCiz();
 }
 
 window.hedefSil = function(index) {
     hedefler.splice(index, 1);
-    localStorage.setItem('yksHedefler', JSON.stringify(hedefler));
+    firebaseVerileriKaydet();
     hedefleriCiz();
 }
 
@@ -1807,4 +1874,227 @@ window.manuelSayfaGit = function() {
 window.sayfaDegistir = function(page) {
     currentPage = page;
     gosterSayfa();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Arayüz Elemanları
+    const authModal = document.getElementById('auth-modal');
+    const authBaslik = document.getElementById('auth-baslik');
+    const authEmail = document.getElementById('auth-email'); // Yeni E-posta alanı
+    const authKullaniciAdi = document.getElementById('auth-kullanici-adi');
+    const authSifre = document.getElementById('auth-sifre');
+    const authSifremiUnuttum = document.getElementById('auth-sifremi-unuttum');
+    const authOnayBtn = document.getElementById('auth-onay-btn');
+    const authModDegistir = document.getElementById('auth-mod-degistir');
+    const authSoru = document.getElementById('auth-soru');
+    const authHata = document.getElementById('auth-hata');
+    
+    const profilBtn = document.getElementById('profil-btn');
+    const profilDropdown = document.getElementById('profil-dropdown');
+    const profilBasHarf = document.getElementById('profil-bas-harf');
+    const hesapBilgisi = document.getElementById('hesap-bilgisi');
+    const cikisBtn = document.getElementById('cikis-btn');
+
+    let isLoginMode = true; 
+    authKullaniciAdi.style.display = 'none'; // Başlangıçta giriş modu olduğu için kullanıcı adını gizle
+
+    // --- 1. OTURUM KONTROLÜ ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            authModal.style.display = 'none';
+            // Kaydettiğimiz kullanıcı adını (displayName) çekiyoruz
+            const kullaniciAdi = user.displayName || "Kullanıcı";
+            profilBasHarf.textContent = kullaniciAdi.charAt(0).toUpperCase();
+            hesapBilgisi.textContent = kullaniciAdi;
+        } else {
+            authModal.style.display = 'flex';
+        }
+    });
+
+    // --- 2. GİRİŞ VE KAYIT İŞLEMLERİ ---
+    authOnayBtn.addEventListener('click', () => {
+        const email = authEmail.value.trim();
+        const password = authSifre.value.trim();
+        const username = authKullaniciAdi.value.trim();
+        
+        // Ortak Boşluk Kontrolü
+        if (email === '' || password === '') {
+            hataGoster("E-posta ve şifre boş bırakılamaz!");
+            return;
+        }
+
+        // --- ŞİFREMİ UNUTTUM İŞLEMİ ---
+        authSifremiUnuttum.addEventListener('click', () => {
+            const email = authEmail.value.trim();
+            
+            if (email === '') {
+                hataGoster("Lütfen şifrenizi sıfırlamak için önce e-posta adresinizi girin!");
+                return;
+            }
+
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    // Başarılı olursa hata kutusunu yeşil yapıp bilgi verelim
+                    authHata.style.color = "#10b981"; // Yeşil renk
+                    hataGoster("Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu (ve spam klasörünü) kontrol edin.");
+                    
+                    // 3 saniye sonra rengi tekrar orijinal kırmızıya döndürelim ki sonraki hatalar kırmızı görünsün
+                    setTimeout(() => {
+                        authHata.style.color = "#ef4444"; 
+                    }, 3000);
+                })
+                .catch((error) => {
+                    authHata.style.color = "#ef4444"; // Kırmızı renk
+                    // Firebase hatalarını Türkçeleştirme
+                    if (error.code === 'auth/user-not-found') {
+                        hataGoster("Bu e-posta adresine kayıtlı bir hesap bulunamadı.");
+                    } else if (error.code === 'auth/invalid-email') {
+                        hataGoster("Lütfen geçerli bir e-posta adresi girin.");
+                    } else {
+                        hataGoster("E-posta gönderilirken bir hata oluştu: " + error.message);
+                    }
+                });
+        });
+
+        if (isLoginMode) {
+            // --- GİRİŞ YAPMA MANTIĞI ---
+            signInWithEmailAndPassword(auth, email, password)
+                .catch((error) => {
+                    hataGoster("E-posta veya şifre hatalı!");
+                    console.error(error);
+                });
+        } else {
+            // --- KAYIT OLMA MANTIĞI VE KISITLAMALAR ---
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Artık updateProfile tanımlı olduğu için sorunsuz çalışacak
+                    return updateProfile(userCredential.user, {
+                        displayName: username
+                    });
+                })
+                .then(() => {
+                    window.location.reload(); // Profil güncellendikten sonra sayfayı yeniler
+                })
+                // Kayıt olma fonksiyonunun hata yakalama (catch) kısmı
+                .catch((error) => {
+                    const hataKutusu = document.getElementById('auth-hata');
+                    hataKutusu.style.display = 'block'; // Gizli olan hata kutusunu görünür yapıyoruz
+
+                    // Firebase'den gelen hata koduna göre kullanıcı dostu mesajlar
+                    switch (error.code) {
+                        case 'auth/email-already-in-use':
+                            hataKutusu.innerText = 'Bu e-posta adresi zaten başka bir hesap tarafından kullanılıyor.';
+                            break;
+            
+                        case 'auth/weak-password':
+                            hataKutusu.innerText = 'Şifre çok zayıf! Lütfen en az 6 karakterden oluşan daha güvenli bir şifre belirleyin.';
+                            break;
+            
+                        case 'auth/invalid-email':
+                            hataKutusu.innerText = 'Girdiğiniz e-posta adresi geçersiz. Lütfen formatı kontrol edin (örnek@domain.com).';
+                            break;
+            
+                        case 'auth/operation-not-allowed':
+                            hataKutusu.innerText = 'E-posta/Şifre ile kayıt olma özelliği şu anda sunucuda aktif değil.';
+                            break;
+                            
+                        case 'auth/network-request-failed':
+                            hataKutusu.innerText = 'İnternet bağlantısı kurulamadı. Lütfen bağlantınızı kontrol edip tekrar deneyin.';
+                            break;
+                            
+                        default:
+                            // Gözden kaçan beklenmedik bir durum olursa sistem orijinal mesajı basar
+                            hataKutusu.innerText = 'Kayıt esnasında beklenmedik bir hata oluştu: ' + error.message;
+                    }
+                });
+        }
+    });
+
+    // --- 3. GİRİŞ / KAYIT EKRANI GEÇİŞİ ---
+    authModDegistir.addEventListener('click', () => {
+        isLoginMode = !isLoginMode;
+        authEmail.value = '';
+        authKullaniciAdi.value = '';
+        authSifre.value = '';
+        authHata.style.display = 'none';
+        authHata.style.color = "#ef4444";
+
+        if (isLoginMode) {
+            authBaslik.textContent = "Giriş Yap";
+            authOnayBtn.textContent = "Giriş Yap";
+            authSoru.textContent = "Hesabın yok mu?";
+            authModDegistir.textContent = "Kayıt Ol";
+            authKullaniciAdi.style.display = 'none'; // Giriş yaparken kullanıcı adı sorulmaz
+            authSifremiUnuttum.style.display = 'block';
+        } else {
+            authBaslik.textContent = "Kayıt Ol";
+            authOnayBtn.textContent = "Kayıt Ol";
+            authSoru.textContent = "Zaten bir hesabın var mı?";
+            authModDegistir.textContent = "Giriş Yap";
+            authKullaniciAdi.style.display = 'block'; // Kayıt olurken kullanıcı adını göster
+            authSifremiUnuttum.style.display = 'none';
+        }
+    });
+
+    function hataGoster(mesaj) {
+        authHata.textContent = mesaj;
+        authHata.style.display = 'block';
+    }
+
+    profilBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profilDropdown.classList.toggle('dropdown-acik');
+        profilDropdown.classList.toggle('dropdown-gizli');
+    });
+
+    document.addEventListener('click', () => {
+        if (profilDropdown.classList.contains('dropdown-acik')) {
+            profilDropdown.classList.remove('dropdown-acik');
+            profilDropdown.classList.add('dropdown-gizli');
+        }
+    });
+
+    // --- 4. ÇIKIŞ YAPMA ---
+    cikisBtn.addEventListener('click', () => {
+        signOut(auth).then(() => {
+            // Çıkış başarılı olduğunda input alanlarını temizle
+            authEmail.value = '';
+            authSifre.value = '';
+            authKullaniciAdi.value = '';
+            
+            // Alternatif olarak, çıkış sonrası arayüzün tamamen sıfırlanması için
+            // sayfayı yenilemek isterseniz alttaki satırı aktifleştirebilirsiniz:
+            // window.location.reload();
+        }).catch((error) => {
+            console.error("Çıkış yapılırken bir hata oluştu: ", error);
+        });
+    });
+});
+
+// Profil menüsü açıkken dışarıya tıklanırsa menüyü kapat
+document.addEventListener('click', function(event) {
+    const profilKapsayici = document.querySelector('.profil-kapsayici');
+    const profilDropdown = document.getElementById('profil-dropdown');
+    
+    // Eğer tıklanan yer profil butonunun veya dropdown'ın dışındaysa ve menü açıksa
+    if (profilKapsayici && !profilKapsayici.contains(event.target)) {
+        profilDropdown.classList.remove('dropdown-acik');
+        profilDropdown.classList.add('dropdown-gizli');
+    }
+});
+
+// Firebase Veri Kaydetme Fonksiyonu
+async function firebaseVerileriKaydet() {
+    if (!aktifKullaniciId) return; // Kullanıcı giriş yapmamışsa kaydetme
+    
+    const userRef = doc(db, "kullanicilar", aktifKullaniciId);
+    try {
+        await setDoc(userRef, {
+            denemeler: tumDenemeler,
+            tercihler: tercihListem,
+            hedefler: hedefler
+        }, { merge: true }); // merge: true mevcut verilerin üzerine yazar, silmez
+    } catch (error) {
+        console.error("Veriler Firebase'e kaydedilirken hata oluştu: ", error);
+    }
 }
