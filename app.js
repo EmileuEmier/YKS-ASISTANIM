@@ -842,8 +842,17 @@ window.addEventListener('click', () => {
 });
 
 function populateDropdown(dataKey, containerId) {
-    // Verileri benzersiz hale getir ve harf sırasına diz
-    const uniqueValues = [...new Set(mockDatabase.map(item => item[dataKey]))].filter(Boolean).sort();
+    let uniqueValues = [];
+
+    if (dataKey === 'prog') {
+        // Sadece programlar için: Parantez içlerini ve etrafındaki boşlukları temizle
+        const hamProgramlar = mockDatabase.map(item => item[dataKey]).filter(Boolean);
+        uniqueValues = [...new Set(hamProgramlar.map(p => p.replace(/\s*\(.*?\)\s*/g, '').trim()))].sort();
+    } else {
+        // Diğer filtreler (Üniversite, Şehir vb.) için orijinal mantık
+        uniqueValues = [...new Set(mockDatabase.map(item => item[dataKey]))].filter(Boolean).sort();
+    }
+    
     const container = document.getElementById(containerId);
     
     // Arama kutusu ve checkbox listesi için HTML yapısı
@@ -946,7 +955,10 @@ function filterData() {
 
         if (puanTipleri.length > 0 && !puanTipleri.includes(item.puanTuru)) return false;
         if (uniler.length > 0 && !uniler.includes(item.uni)) return false;
-        if (proglar.length > 0 && !proglar.includes(item.prog)) return false;
+        if (proglar.length > 0) {
+            const temizProg = item.prog.replace(/\s*\(.*?\)\s*/g, '').trim();
+            if (!proglar.includes(temizProg)) return false;
+        }
         if (sehirler.length > 0 && !sehirler.includes(item.sehir)) return false;
         if (dereceler.length > 0 && !dereceler.includes(item.derece)) return false;
         if (uniTurleri.length > 0 && !uniTurleri.includes(item.uniTuru)) return false;
