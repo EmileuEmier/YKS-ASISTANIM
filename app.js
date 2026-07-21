@@ -950,8 +950,22 @@ function filterData() {
     const filtered = mockDatabase.filter(item => {
         if (gosterSadeceListem && !tercihListem.includes(item.id)) return false;
         if (kodVal && !item.programKodu.includes(kodVal)) return false;
+
+        // 1. Kullanıcı bir sıralama filtresi kullanıyor mu?
+        const siraFiltresiAktif = (enAz !== 0 || enCok !== 9999999);
+
+        // 2. Programın sıralama verisi "yok" mu? ("-", 0, null, boş metin veya tanımsız ise)
+        const siraGecersiz = (item.sira === "-" || item.sira === 0 || item.sira === "" || item.sira === null || isNaN(item.sira));
+
+        // 3. EĞER kullanıcı filtreye değer girmişse VE programın sıralaması yoksa, direkt listeden çıkar!
+        if (siraFiltresiAktif && siraGecersiz) {
+            return false;
+        }
+
+        // 4. Normal sayısal kontroller (Sıralaması olan programlar için)
         if (item.sira > enAz && enAz !== 0) return false; 
         if (item.sira < enCok && enCok !== 9999999) return false;
+
 
         if (puanTipleri.length > 0 && !puanTipleri.includes(item.puanTuru)) return false;
         if (uniler.length > 0 && !uniler.includes(item.uni)) return false;
