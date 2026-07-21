@@ -6,8 +6,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/fireba
 // Firestore import satırını bu şekilde güncelle:
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 // Auth için import satırını şu şekilde güncelle:
-// Auth için import satırını şu şekilde güncelle:
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, sendPasswordResetEmail, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBUatB-qKrdPzzNoI6h1vOostNwjpzANb4",
@@ -30,14 +29,54 @@ let aktifKullaniciId = null;
 
 // Kullanıcı giriş durumunu dinle
 onAuthStateChanged(auth, async (user) => {
+    const authIslemButonu = document.getElementById('cikis-btn'); 
+
+    if (!authIslemButonu) {
+        return;
+    }
+
     if (user) {
-        aktifKullaniciId = user.uid; // Kullanıcının benzersiz ID'si
-        await kullaniciVerileriniGetir(aktifKullaniciId);
+        aktifKullaniciId = user.uid; 
+        const kullaniciAdi = user.displayName || "Anonim";
+        
+        if (kullaniciAdi === "Anonim" || user.isAnonymous) {
+            // "Üye Ol" durumu -> Arka planı yeşil yapıyoruz
+            authIslemButonu.innerHTML = '<i class="fa-solid fa-user-plus"></i> Üye Ol';
+            authIslemButonu.style.backgroundColor = '#22c55e'; // Modern yeşil renk
+            authIslemButonu.style.color = '#ffffff'; // Yazı rengini beyaz yapıyoruz ki okunsun
+            
+            authIslemButonu.onclick = () => {
+                const modal = document.getElementById('auth-modal');
+                if (modal) modal.style.display = 'flex';
+            };
+        } else {
+            // Normal kullanıcı (Çıkış Yap durumu) -> Renkleri varsayılana döndürüyoruz
+            authIslemButonu.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap';
+            authIslemButonu.style.backgroundColor = ''; // CSS'teki orijinal rengine döner
+            authIslemButonu.style.color = '';
+            
+            authIslemButonu.onclick = () => {
+                signOut(auth).then(() => {
+                    window.location.reload();
+                });
+            };
+        }
+
+        if (typeof kullaniciVerileriniGetir === 'function') {
+            await kullaniciVerileriniGetir(aktifKullaniciId);
+        }
     } else {
-        // Yönlendirme iptal edildi.
-        // Kullanıcı giriş yapmamışsa sayfanın en altındaki DOMContentLoaded
-        // içindeki listener zaten auth-modal'ı (popup'ı) açacaktır.
-        aktifKullaniciId = null; 
+        aktifKullaniciId = null;
+        
+        // Giriş Yap durumu -> Renkleri varsayılana döndürüyoruz
+        authIslemButonu.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Giriş Yap';
+        authIslemButonu.style.backgroundColor = ''; 
+        authIslemButonu.style.color = '';
+        
+        authIslemButonu.onclick = () => {
+            const modal = document.getElementById('auth-modal');
+            if (modal) modal.style.display = 'flex';
+        };
     }
 });
 
@@ -1888,6 +1927,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const authModDegistir = document.getElementById('auth-mod-degistir');
     const authSoru = document.getElementById('auth-soru');
     const authHata = document.getElementById('auth-hata');
+    const btnMisafirGiris = document.getElementById('btn-misafir-giris');
     
     const profilBtn = document.getElementById('profil-btn');
     const profilDropdown = document.getElementById('profil-dropdown');
@@ -1903,13 +1943,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             authModal.style.display = 'none';
             // Kaydettiğimiz kullanıcı adını (displayName) çekiyoruz
-            const kullaniciAdi = user.displayName || "Kullanıcı";
+            const kullaniciAdi = user.displayName || "Anonim";
             profilBasHarf.textContent = kullaniciAdi.charAt(0).toUpperCase();
             hesapBilgisi.textContent = kullaniciAdi;
         } else {
             authModal.style.display = 'flex';
         }
     });
+
+    if (btnMisafirGiris) {
+        btnMisafirGiris.addEventListener('click', () => {
+            signInAnonymously(auth)
+                .then(() => {
+                    // Giriş başarılı olduğunda onAuthStateChanged otomatik tetiklenir ve modal kapanır.
+                    console.log("Misafir olarak giriş yapıldı.");
+                })
+                .catch((error) => {
+                    authHata.style.display = 'block';
+                    authHata.style.color = "#ef4444";
+                    authHata.innerText = 'Misafir girişi başarısız oldu: ' + error.message;
+                });
+        });
+    }
 
     // --- 2. GİRİŞ VE KAYIT İŞLEMLERİ ---
     authOnayBtn.addEventListener('click', () => {
@@ -2098,3 +2153,17 @@ async function firebaseVerileriKaydet() {
         console.error("Veriler Firebase'e kaydedilirken hata oluştu: ", error);
     }
 }
+
+// Misafir Girişi Butonu Dinleyicisi
+document.getElementById('btn-misafir').addEventListener('click', () => {
+    signInAnonymously(auth)
+        .then(() => {
+            console.log("Misafir girişi başarılı!");
+            // Giriş başarılı olunca giriş/kayıt modalını (popup) gizle
+            // Kendi projenizdeki modal ID'si neyse onu yazmalısın (Örn: auth-modal)
+            document.getElementById('auth-modal').style.display = 'none'; 
+        })
+        .catch((error) => {
+            console.error("Misafir girişi başarısız:", error.message);
+        });
+});
