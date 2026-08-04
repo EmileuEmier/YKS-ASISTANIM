@@ -173,8 +173,8 @@ def excelden_jsona_cevir(excel_dosyasi, json_dosyasi):
             if current_uni.endswith("-"):
                 current_uni = current_uni[:-1].strip()
 
-            # Üniversite satırının S sütunundan (18. indeks) akreditasyonu al, boşsa "-" yap
-            uni_s_col = get_val(row, 18)
+            # Üniversite satırının R sütunundan (18. indeks) akreditasyonu al, boşsa "-" yap
+            uni_s_col = get_val(row, 17) #değişti
             current_akreditasyon = uni_s_col if uni_s_col else "-"
 
         # --- 2. FAKÜLTE SATIRI KONTROLÜ (Kalın Fontlu Satır) ---
@@ -190,7 +190,7 @@ def excelden_jsona_cevir(excel_dosyasi, json_dosyasi):
             prog_upper = prog_ad.upper()
 
             # Programın kendi S sütununa (18. indeks) bakıyoruz
-            prog_s_col = get_val(row, 18)
+            prog_s_col = get_val(row, 17)
             
             # Eğer programın kendi S sütunu doluysa onu yaz, boşsa üniversiteninkini yaz
             akreditasyon_degeri = prog_s_col if prog_s_col else current_akreditasyon
@@ -223,8 +223,8 @@ def excelden_jsona_cevir(excel_dosyasi, json_dosyasi):
             kontenjan_str = get_val(row, 4)
             kontenjan = int(kontenjan_str) if kontenjan_str.isdigit() else kontenjan_str
 
-            # L Sütunu (Sıra / Doluluk Oranı İçin Referans)
-            col_l = get_val(row, 11)
+            # K Sütunu (Sıra / Doluluk Oranı İçin Referans)
+            col_l = get_val(row, 10) #değişti
             l_dolu_mu = bool(col_l and col_l != "-")
 
             if l_dolu_mu:
@@ -236,8 +236,8 @@ def excelden_jsona_cevir(excel_dosyasi, json_dosyasi):
                 bos = "-"
                 doluluk = "Dolmamış"
 
-            # M sütunundaki Puan (Virgülleri noktaya çevirerek float formatına alıyoruz)
-            puan_str = get_val(row, 12).replace(',', '.').strip()
+            # L sütunundaki Puan (Virgülleri noktaya çevirerek float formatına alıyoruz)
+            puan_str = get_val(row, 11).replace(',', '.').strip() #değişti
             try:
                 puan = float(puan_str)
             except ValueError:
@@ -283,7 +283,7 @@ def excelden_jsona_cevir(excel_dosyasi, json_dosyasi):
 
 # --- KULLANIM BÖLÜMÜ ---
 # Excel dosyanızın adı (Örn: 'yks_tablo.xlsx')
-excel_dosya_adi = '2.xlsx' 
+excel_dosya_adi = 'universitelerTYT.xlsx' 
 # Çıktı alınacak JSON dosyasının adı
 json_ciktisi_adi = 'universiteler2.json'
 
