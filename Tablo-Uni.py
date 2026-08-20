@@ -1,7 +1,7 @@
 import json
 import openpyxl
 
-# BURAYA KENDİ ŞEHİRLER LİSTENİZİ YAPIŞTIRIN
+# BURAYA KENDİ ŞEHİRLER LİSTENİZİ YAPIŞTIRIN 
 # Örnek: SEHIRLER = ["ADANA", "ANKARA", "İSTANBUL", "İZMİR", "TRABZON", ...]
 SEHIRLER = [
     "ADANA",
