@@ -29,5 +29,8 @@ Bu projede kullanılan üniversite ve bölüm verileri, [YÖK Atlas](https://yok
 
 **parantez_temizle**: Güncellenen verilerde gereksiz kalan parantez içi verileri siler.
 
+## Canlı Demo
+[Uygulamayı Aç](https://emileuemier.github.io/YKS-ASISTANIM/)
+
 ## Lisans
 Bu proje "Tüm Hakları Saklıdır" kapsamında korunmaktadır. Detaylar için `LICENSE` dosyasına bakınız.
